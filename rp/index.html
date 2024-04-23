@@ -12,6 +12,8 @@
 </body>
 <script>
   async function signIn() {
+    // Invoke the API with the mode parameter like so:
+    // Ref: https://developers.google.com/privacy-sandbox/blog/fedcm-chrome-125-updates
     const resp = await navigator.credentials.get({
       identity: {
         providers: [

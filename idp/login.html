@@ -31,6 +31,8 @@
         })
       });
       if (resp.status == 200) {
+        // Call navigator.login.setStatus() to notify the user agent that the user has successfully logged in.
+        // Ref: https://developers.google.com/privacy-sandbox/blog/fedcm-chrome-120-updates
         navigator.login.setStatus("logged-in");
         window.IdentityProvider.close();
         return;
