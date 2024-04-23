@@ -46,6 +46,10 @@ func main() {
 // accountsHandler implements the accounts endpoint.
 // Ref: https://developers.google.com/privacy-sandbox/3pcd/fedcm-developer-guide#accounts-list-endpoint
 func accountsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Header.Get("Sec-Fetch-Dest") != "webidentity" {
+		jsonResponse(w, map[string]string{"error": "Invalid request"}, http.StatusBadRequest)
+		return
+	}
 	jsonResponse(w, map[string]interface{}{"accounts": []map[string]string{{"id": "1234", "name": "John Doe", "email": "john_doe@idp.example"}}}, http.StatusOK)
 }
 
@@ -58,10 +62,31 @@ func webIdentityHandler(w http.ResponseWriter, r *http.Request) {
 // fedcmAssertionHandler implements the ID assertion endpoint.
 // Ref: https://developers.google.com/privacy-sandbox/3pcd/fedcm-developer-guide#id-assertion-endpoint
 func fedcmAssertionHandler(w http.ResponseWriter, r *http.Request) {
+	// Error response is defined in the spec.
+	// Ref: https://developers.google.com/privacy-sandbox/3pcd/fedcm-developer-guide#error-response
+	if r.Header.Get("Sec-Fetch-Dest") != "webidentity" {
+		slog.Info("Invalid request", "Sec-Fetch-Dest", r.Header.Get("Sec-Fetch-Dest"))
+		jsonResponse(w, map[string]map[string]string{"error": {"code": "access_denied", "url": "http://localhost:8002?type=access_denied"}}, http.StatusBadRequest)
+		return
+	}
+	if r.Header.Get("Origin") != "http://localhost:8001" || r.FormValue("client_id") != "123" {
+		slog.Info("Invalid request", "origin", r.Header.Get("Origin"), "client_id", r.FormValue("client_id"))
+		jsonResponse(w, map[string]map[string]string{"error": {"code": "access_denied", "url": "http://localhost:8002?type=access_denied"}}, http.StatusBadRequest)
+		return
+	}
+	if r.FormValue("account_id") != "1234" {
+		slog.Info("Invalid request", "account_id", r.FormValue("account_id"))
+		jsonResponse(w, map[string]map[string]string{"error": {"code": "access_denied", "url": "http://localhost:8002?type=access_denied"}}, http.StatusBadRequest)
+		return
+	}
+	if r.FormValue("nonce") != "456" {
+		slog.Info("Invalid request", "nonce", r.FormValue("nonce"))
+	}
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:8001")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-	jsonResponse(w, map[string]string{"token": "*****"}, http.StatusOK)
+	// TODO: Implement the issuance of the assertion token using the account ID, client ID, issuer origin and nonce.
+	jsonResponse(w, map[string]string{"token": "***********"}, http.StatusOK)
 }
 
 // configJSONHandler implements the IdP config file endpoint.
@@ -79,6 +104,10 @@ func configJSONHandler(w http.ResponseWriter, r *http.Request) {
 // clientMetadataHandler implements the client metadata endpoint.
 // Ref: https://developers.google.com/privacy-sandbox/3pcd/fedcm-developer-guide#client-metadata-endpoint
 func clientMetadataHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Header.Get("Sec-Fetch-Dest") != "webidentity" {
+		jsonResponse(w, map[string]string{"error": "Invalid request"}, http.StatusBadRequest)
+		return
+	}
 	clientID := r.FormValue("client_id")
 	if clientID != "123" {
 		jsonResponse(w, map[string]string{"error": "invalid client_id."}, http.StatusBadRequest)
