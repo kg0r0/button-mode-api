@@ -20,7 +20,7 @@ button-mode-api/rp $ go run main.go
 button-mode-api/idp $ go run main.go
 ```
 
-Access to http://localhost:8081.
+Access to http://localhost:8001.
 
 ![button_mode_api](https://github.com/kg0r0/button-mode-api/assets/33596117/9f75377a-2ab4-4a3c-9e56-19b02f954e7e)
 
