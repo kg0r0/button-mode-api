@@ -1,6 +1,6 @@
 # button-mode-api
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)  
-:white_square_button: Experimental implementation of Button Mode API  
+:white_square_button: Experimental implementation of FedCM - Button Mode API  
 
  This simple implementation provides for developers to try out [Button Mode API](https://developers.google.com/privacy-sandbox/blog/fedcm-chrome-125-updates) in their local environment. 
 
@@ -12,12 +12,16 @@ From Chrome 125, the Button Mode API is starting an origin trial on desktop. So 
 
 <img width="1498" alt="image" src="https://github.com/kg0r0/button-mode-api/assets/33596117/ff4419cf-afbc-43d5-98e4-e2afdb8e0431" width=600px>
 
-Run the IdP and RP server with the following commands:
+Run the IdP and RP server with one of the following commands:
 
 ```bash
-button-mode-api/rp $ go run main.go
+# Use docker 
+$ docker-compose build
+$ docker-compose up -d
 
-button-mode-api/idp $ go run main.go
+# No use of docker
+rp $ go run main.go
+idp $ go run main.go
 ```
 
 Access to http://localhost:8001.
